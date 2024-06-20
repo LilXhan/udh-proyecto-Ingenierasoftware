@@ -18,6 +18,8 @@ def establecimiento_registrar():
 
 @app.route("/establecimientos/guardar", methods=["POST"])
 def establecimiento_guardar():
+    global id
+    id = 0
     nombre = request.form["nombre"]
     responsable = request.form["responsable"]
     ubicacion = request.form["ubicacion"]
@@ -25,9 +27,12 @@ def establecimiento_guardar():
     conexion = Conexion()
     conexion_local = conexion.obtener_conexion()
     with conexion_local.cursor() as cursor:
-        sql = "INSERT INTO `establecimientos` (`nombre`, `ubicacion`, `responsable`) VALUES (%s, %s,  %s)"
-        cursor.execute(sql, (nombre, ubicacion, responsable))
-        # cursor.execute("INSERT INTO `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)", (last_id, servicio))
+        cursor.execute('insert into `establecimientos` (`nombre`, `ubicacion`, `responsable`) values (%s, %s,  %s)', (nombre, ubicacion, responsable))
+        cursor.execute('select id from `establecimientos` order by id desc limit 1')
+        id = cursor.fetchone()[0]
+    for servicio in servicios:
+        with conexion_local.cursor() as cursor:
+            cursor.execute("INSERT INTO `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)", (id, servicio))
     conexion_local.commit()
     conexion_local.close()
     return f"usuario: {servicios}"
