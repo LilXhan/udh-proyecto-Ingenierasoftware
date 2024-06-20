@@ -1,0 +1,61 @@
+<style>
+  * {
+    font-family: arial, sans-serif;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+</style>
+  
+
+<h1>Establecimientos</h1>
+<table>
+  <tr>
+      <th>Nombre</th>
+      <th>Dirección</th>
+      <th>Responsable</th>
+      <th>Servicios</th>
+      <th>Opciones</th>
+  </tr>
+  {% for establecimiento in establecimientos %}
+  <tr>
+      <td>
+          {{ establecimiento[1] }}
+      </td>
+      <td>
+          {{ establecimiento[2] }}
+      </td>
+      <td>
+          {{ establecimiento[3] }}
+      </td>
+      <td>
+          {{ establecimiento[4] }}
+      </td>
+      <td>
+      <a href="/establecimiento/actualizar/{{ establecimiento[0] }}">
+                    Editar
+      </a>
+      -
+      <a href="/establecimiento/eliminar/{{ establecimiento[0] }}">
+        Eliminar
+      </a>
+      </td>
+  </tr>
+  {% endfor %}
+</table>
+<hr>
+<a href="">
+  Registrar
+</a>

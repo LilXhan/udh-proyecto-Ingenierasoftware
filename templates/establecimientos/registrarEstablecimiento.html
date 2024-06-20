@@ -1,0 +1,17 @@
+<h1>Registro establecimiento</h1>
+<form method="post" action="/establecimientos/guardar">
+    <input type="text" name="nombre" placeholder="Ingrese el nombre"><p></p>
+    <input type="text" name="responsable" placeholder="Ingrese el responsable"><p></p>
+    <input type="text" name="ubicacion" placeholder="Ingrese la ubicacion"><p></p>
+    <fieldset>
+      <legend>Elige tus servicios ofrecidos:</legend>
+      {% for servicio in servicios %}
+      <label for="{{servicio[0]}}">
+          <input type="checkbox" id="{{servicio[0]}}" name="servicios" value="{{servicio[0]}}">
+          {{ servicio[1] }}
+      </label>
+      {% endfor %}
+    </fieldset>
+    <p></p>
+    <input type="submit" value="Registrar">
+</form>
