@@ -122,4 +122,20 @@ def establecimiento_eliminar(id):
     conexion_local.commit()
     conexion_local.close()
     return 'eliminado'
+
 # RUTAS SERVICIOS QUE OFRECE ESTABLECIMIENTOS
+
+@app.route("/servicios/registrar")
+def servicio_registrar():
+    return render_template("/servicios/registrarServicios.html")
+
+@app.route("/servicios/guardar", methods=["POST"])
+def servicio_guardar():
+    nombre = request.form["nombre"]
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute('insert into `servicios` (`nombre`) values (%s)', (nombre))
+    conexion_local.commit()
+    conexion_local.close()
+    return f"servicio guardado: {nombre}"
