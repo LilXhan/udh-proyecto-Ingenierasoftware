@@ -105,7 +105,7 @@ def establecimiento_actualizar_guardar(id):
     conexion_local.commit()
     for servicio in servicios:
         with conexion_local.cursor() as cursor:
-            cursor.execute('INSERT INTO `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)', (id, servicio))
+            cursor.execute('insert into `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)', (id, servicio))
     conexion_local.commit()
     conexion_local.close()
     return f"servicios: {servicios}"
@@ -116,9 +116,9 @@ def establecimiento_eliminar(id):
     conexion = Conexion()
     conexion_local = conexion.obtener_conexion()
     with conexion_local.cursor() as cursor:
-        cursor.execute('DELETE FROM `establecimiento_servicio` WHERE `establecimiento_id`=%s', (id))
+        cursor.execute('delete from `establecimiento_servicio` where `establecimiento_id`=%s', (id))
     with conexion_local.cursor() as cursor:
-        cursor.execute('DELETE FROM `establecimientos` WHERE `id`=%s', (id,))
+        cursor.execute('delete from `establecimientos` where `id`=%s', (id,))
     conexion_local.commit()
     conexion_local.close()
     return 'eliminado'
