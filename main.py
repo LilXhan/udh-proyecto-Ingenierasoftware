@@ -60,16 +60,36 @@ def establecimiento_mostrar():
     conextion_local.close()
     return render_template("/establecimientos/mostrarEstablecimientos.html", establecimientos=establecimientos)
 
-@app.route("/establecmientos/actualizar/<id>")
+
+@app.route("/establecimientos/actualizar/<id>")
 def establecimiento_actualizar(id):
-    usuario = {}
+    establecimiento = ()
     conexion = Conexion()
     conextion_local = conexion.obtener_conexion()
     with conextion_local.cursor() as cursor:
-        cursor.execute(f'SELECT * FROM usuario where id = {id}')
-        usuario = cursor.fetchall()
+        cursor.execute(f"""
+                select 
+                    e.id,
+                    e.nombre as Nombre, 
+                    e.ubicacion as Ubicacion, 
+                    e.responsable as Responsable, 
+                    group_concat(s.nombre SEPARATOR ', ') as Servicios 
+                from establecimiento_servicio as es
+                join establecimientos as e
+                    on es.establecimiento_id = e.id
+                join servicios as s
+                    on es.servicio_id = s.id
+                where e.id = {id}
+                group by e.id, e.nombre, e.ubicacion, e.responsable""")
+        establecimiento = cursor.fetchone()
+    servicios = establecimiento[4]
+    servicios = servicios.split(', ')
     conextion_local.close()
-    return render_template("editarEstablecimientos.html", usuario=usuario)
+    print(establecimiento)
+    print(servicios)
+    return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, servicios = servicios)
+
+
 
 
 # RUTAS SERVICIOS QUE OFRECE ESTABLECIMIENTOS
