@@ -1,0 +1,22 @@
+<h1>Editar establecimiento</h1>
+<form method="post" action="/establecimientos/actualizar/guardar/{{establecimiento[0]}}">
+    <input type="text" name="nombre" value="{{ establecimiento[1] }}" placeholder="Ingrese el nombre"><p></p>
+    <input type="text" name="responsable" value="{{ establecimiento[2] }}" placeholder="Ingrese el responsable"><p></p>
+    <input type="text" name="ubicacion" value="{{ establecimiento[3] }}" placeholder="Ingrese la ubicacion"><p></p>
+    <fieldset>
+      <legend>Elige tus servicios ofrecidos:</legend>
+      {% for servicio in servicios %}
+      <label for="{{servicio[0]}}">
+          {% if servicio[1] in establecimiento_servicios %}
+          <input type="checkbox" checked id="{{servicio[0]}}" name="servicios" value="{{servicio[0]}}">
+          {{ servicio[1] }}
+          {% else %}
+          <input type="checkbox" id="{{servicio[0]}}" name="servicios" value="{{servicio[0]}}">
+          {{ servicio[1] }}
+          {% endif %}
+      </label>
+      {% endfor %}
+    </fieldset>
+    <p></p>
+    <input type="submit" value="Actualizar">
+</form>

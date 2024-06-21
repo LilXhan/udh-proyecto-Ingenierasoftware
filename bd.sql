@@ -31,19 +31,19 @@ CREATE TABLE IF NOT EXISTS `establecimiento_servicio` (
 );
 
 
-INSERT INTO servicios (nombre) VALUES 
+INSERT INTO `servicios` (`nombre`) VALUES 
 ('Restaurante'),
 ('Recreo Turístico'),
 ('Cafetería'),
 ('Sándwiches');
 
-INSERT INTO establecimientos (nombre, ubicacion, responsable) VALUES 
+INSERT INTO `establecimientos` (`nombre`, `ubicacion`, `responsable`) VALUES 
 ('Recreo Falcón', 'Jirón 2 de Mayo, 190, Huánuco', 'Juan Pérez'),
 ('La Casona Huanuqueña', 'Parque Amarilis, Huánuco', 'María López'),
 ('Cafe San Ignacio', 'Jirón Bolívar 308, Huánuco', 'Luis Gutiérrez'),
 ('Facucho', 'Jirón 2 de Mayo 871, Huánuco', 'Ana Rodríguez');
 
-INSERT INTO establecimiento_servicio (establecimiento_id, servicio_id) VALUES 
+INSERT INTO `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES 
 (1, 2),
 (1, 1),
 (2, 1),

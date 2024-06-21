@@ -18,7 +18,6 @@ def establecimiento_registrar():
 
 @app.route("/establecimientos/guardar", methods=["POST"])
 def establecimiento_guardar():
-    global id
     id = 0
     nombre = request.form["nombre"]
     responsable = request.form["responsable"]
@@ -35,7 +34,7 @@ def establecimiento_guardar():
             cursor.execute("INSERT INTO `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)", (id, servicio))
     conexion_local.commit()
     conexion_local.close()
-    return f"usuario: {servicios}"
+    return f"servicios: {servicios}"
 
 @app.route("/establecimientos/mostrar")
 def establecimiento_mostrar():
@@ -64,9 +63,10 @@ def establecimiento_mostrar():
 @app.route("/establecimientos/actualizar/<id>")
 def establecimiento_actualizar(id):
     establecimiento = ()
+    servicios = ()
     conexion = Conexion()
-    conextion_local = conexion.obtener_conexion()
-    with conextion_local.cursor() as cursor:
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
         cursor.execute(f"""
                 select 
                     e.id,
@@ -82,14 +82,44 @@ def establecimiento_actualizar(id):
                 where e.id = {id}
                 group by e.id, e.nombre, e.ubicacion, e.responsable""")
         establecimiento = cursor.fetchone()
-    servicios = establecimiento[4]
-    servicios = servicios.split(', ')
-    conextion_local.close()
-    print(establecimiento)
-    print(servicios)
-    return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, servicios = servicios)
+
+    with conexion_local.cursor() as cursor:
+        cursor.execute("select * from servicios")
+        servicios = cursor.fetchall()
+    establecimiento_servicios = establecimiento[4]
+    establecimiento_servicios = establecimiento_servicios.split(', ')
+    conexion_local.close()
+    return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, establecimiento_servicios=establecimiento_servicios, servicios=servicios)
+
+@app.route("/establecimientos/actualizar/guardar/<id>", methods=['POST'])
+def establecimiento_actualizar_guardar(id):
+    nombre = request.form["nombre"]
+    responsable = request.form["responsable"]
+    ubicacion = request.form["ubicacion"]
+    servicios = request.form.getlist('servicios')
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute(f'update `establecimientos` set `nombre`=%s, `responsable`=%s, `ubicacion`=%s where id=%s', (nombre, responsable, ubicacion, id))
+        cursor.execute(f'delete from `establecimiento_servicio` where `establecimiento_id`=%s', (id))
+    conexion_local.commit()
+    for servicio in servicios:
+        with conexion_local.cursor() as cursor:
+            cursor.execute('INSERT INTO `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)', (id, servicio))
+    conexion_local.commit()
+    conexion_local.close()
+    return f"servicios: {servicios}"
 
 
-
-
+@app.route("/establecimientos/eliminar/<id>", methods=['DELETE', 'GET'])
+def establecimiento_eliminar(id):
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute('DELETE FROM `establecimiento_servicio` WHERE `establecimiento_id`=%s', (id))
+    with conexion_local.cursor() as cursor:
+        cursor.execute('DELETE FROM `establecimientos` WHERE `id`=%s', (id,))
+    conexion_local.commit()
+    conexion_local.close()
+    return 'eliminado'
 # RUTAS SERVICIOS QUE OFRECE ESTABLECIMIENTOS
