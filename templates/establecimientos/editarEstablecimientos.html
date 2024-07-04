@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Establecimientos | Editar{% endblock %}
+{% block content %}
+<div class="container">
+  <h1 class="mt-2 text-center">Editar establecimiento</h1>
+  <hr>
+  <form method="post" action="/establecimientos/actualizar/guardar/{{establecimiento[0]}}">
+      <div class="mb3">
+        <label for="name" class="form-label">Editar el nombre establecimiento:</label>
+        <input id="name" class="form-control" type="text" name="nombre" value="{{ establecimiento[1] }}" placeholder="Ingrese el nombre"><p></p>
+      </div>
+      <div class="mb-3">
+        <label for="ubicacion" class="form-label">Editar la dirección del establecimiento:</label>
+        <input id="ubicacion" class="form-control" type="text" name="ubicacion" value="{{ establecimiento[2] }}" placeholder="Ingrese la ubicacion"><p></p>
+      </div>
+      <div class="mb-3">
+        <label for="responsable" class="form-label">Editar el responsable del establecimiento:</label>
+        <input id="responsable" class="form-control" type="text" name="responsable" value="{{ establecimiento[3] }}" placeholder="Ingrese el responsable"><p></p>
+      </div>
+      <fieldset>
+        <legend>Edita tus servicios ofrecidos:</legend>
+        {% for servicio in servicios %}
+        <div class="form-check">
+          {% if servicio[1] in establecimiento_servicios %}
+          <input class="form-check-input" type="checkbox" checked id="{{servicio[0]}}" name="servicios" value="{{servicio[0]}}">
+          <label class="form-check-label" for="{{servicio[0]}}">
+            {{ servicio[1] }}
+          </label>
+          {% else %}
+          <input class="form-check-input" type="checkbox" id="{{servicio[0]}}" name="servicios" value="{{servicio[0]}}">
+          <label class="form-check-label" for="{{servicio[0]}}">
+            {{ servicio[1] }}
+          </label>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </fieldset>
+      <input class="mt-2 btn btn-primary" type="submit" value="Actualizar">
+  </form>
+</div> 
+{% endblock %}
