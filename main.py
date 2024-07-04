@@ -44,3 +44,59 @@ def establecimiento_guardar():
     conexion_local.commit()
     conexion_local.close()
     return redirect(url_for('establecimiento_mostrar'))
+
+
+@app.route("/establecimientos/mostrar")
+def establecimiento_mostrar():
+    establecimientos = []
+    conexion = Conexion()
+    conextion_local = conexion.obtener_conexion()
+    with conextion_local.cursor() as cursor:
+        cursor.execute("""
+                select 
+                    e.id,
+                    e.nombre as Nombre, 
+                    e.ubicacion as Ubicacion, 
+                    e.responsable as Responsable, 
+                    group_concat(s.nombre SEPARATOR ', ') as Servicios 
+                from establecimiento_servicio as es
+                join establecimientos as e
+                    on es.establecimiento_id = e.id
+                join servicios as s
+                    on es.servicio_id = s.id
+                group by e.id, e.nombre, e.ubicacion, e.responsable""")
+        establecimientos = cursor.fetchall()
+    conextion_local.close()
+    return render_template("/establecimientos/mostrarEstablecimientos.html", establecimientos=establecimientos)
+
+
+@app.route("/establecimientos/actualizar/<id>")
+def establecimiento_actualizar(id):
+    establecimiento = ()
+    servicios = ()
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute(f"""
+                select 
+                    e.id,
+                    e.nombre as Nombre, 
+                    e.ubicacion as Ubicacion, 
+                    e.responsable as Responsable, 
+                    group_concat(s.nombre SEPARATOR ', ') as Servicios 
+                from establecimiento_servicio as es
+                join establecimientos as e
+                    on es.establecimiento_id = e.id
+                join servicios as s
+                    on es.servicio_id = s.id
+                where e.id = {id}
+                group by e.id, e.nombre, e.ubicacion, e.responsable""")
+        establecimiento = cursor.fetchone()
+
+    with conexion_local.cursor() as cursor:
+        cursor.execute("select * from servicios")
+        servicios = cursor.fetchall()
+    establecimiento_servicios = establecimiento[4]
+    establecimiento_servicios = establecimiento_servicios.split(', ')
+    conexion_local.close()
+    return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, establecimiento_servicios=establecimiento_servicios, servicios=servicios)
