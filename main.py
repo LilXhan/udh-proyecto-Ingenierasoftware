@@ -100,3 +100,36 @@ def establecimiento_actualizar(id):
     establecimiento_servicios = establecimiento_servicios.split(', ')
     conexion_local.close()
     return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, establecimiento_servicios=establecimiento_servicios, servicios=servicios)
+
+
+@app.route("/establecimientos/actualizar/guardar/<id>", methods=['POST'])
+def establecimiento_actualizar_guardar(id):
+    nombre = request.form["nombre"]
+    responsable = request.form["responsable"]
+    ubicacion = request.form["ubicacion"]
+    servicios = request.form.getlist('servicios')
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute(f'update `establecimientos` set `nombre`=%s, `responsable`=%s, `ubicacion`=%s where id=%s', (nombre, responsable, ubicacion, id))
+        cursor.execute(f'delete from `establecimiento_servicio` where `establecimiento_id`=%s', (id))
+    conexion_local.commit()
+    for servicio in servicios:
+        with conexion_local.cursor() as cursor:
+            cursor.execute('insert into `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)', (id, servicio))
+    conexion_local.commit()
+    conexion_local.close()
+    return redirect(url_for('establecimiento_mostrar'))
+
+
+@app.route("/establecimientos/eliminar/<id>", methods=['DELETE', 'GET'])
+def establecimiento_eliminar(id):
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute('delete from `establecimiento_servicio` where `establecimiento_id`=%s', (id))
+    with conexion_local.cursor() as cursor:
+        cursor.execute('delete from `establecimientos` where `id`=%s', (id,))
+    conexion_local.commit()
+    conexion_local.close()
+    return redirect(url_for('establecimiento_mostrar'))
