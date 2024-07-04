@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} Establecimientos | Inicio {% endblock %}
+{% block content %}
+  <div class="mt-3 container-sm text-center">
+    <h1 class="display-3">Bienvenido a nuestro sistema de Gestión de Centros Turísticos en Huánuco</h1>
+    <p class="leadd">En la página web, los usuarios podrán registrar y gestionar establecimientos turísticos. 
+      Además, el sistema garantiza seguridad, usabilidad, escalabilidad y disponibilidad las 24 horas.</p>
+    <hr class="my-4">
+
+    <p>¿Tienes una cuenta?</p>
+    <div class="d-flex justify-content-center">
+      <a href="/login" class="btn btn-primary mx-2">Iniciar Sesión</a>
+      <a href="/register" class="btn btn-secondary mx-2">Registrarse</a>
+    </div>
+  </div>
+{% endblock %}
