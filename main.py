@@ -100,3 +100,16 @@ def establecimiento_actualizar(id):
     establecimiento_servicios = establecimiento_servicios.split(', ')
     conexion_local.close()
     return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, establecimiento_servicios=establecimiento_servicios, servicios=servicios)
+
+
+@app.route("/establecimientos/eliminar/<id>", methods=['DELETE', 'GET'])
+def establecimiento_eliminar(id):
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute('delete from `establecimiento_servicio` where `establecimiento_id`=%s', (id))
+    with conexion_local.cursor() as cursor:
+        cursor.execute('delete from `establecimientos` where `id`=%s', (id,))
+    conexion_local.commit()
+    conexion_local.close()
+    return redirect(url_for('establecimiento_mostrar'))
