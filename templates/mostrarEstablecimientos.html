@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Establecimientos{% endblock %}
+{% block content %}
+<div class="container">
+  <h1 class="mt-2 text-center">Establecimientos</h1>
+  <hr>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Dirección</th>
+        <th scope="col">Responsable</th>
+        <th scope="col">Servicios</th>
+        <th scope="col">Opciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for establecimiento in establecimientos %}
+      <tr>
+        <td>
+          {{ establecimiento[1] }}
+        </td>
+        <td>
+          {{ establecimiento[2] }}
+        </td>
+        <td>
+          {{ establecimiento[3] }}
+        </td>
+        <td>
+          {{ establecimiento[4] }}
+        </td>
+        <td>
+          <a class="btn btn-warning btn-sm" href="/establecimientos/actualizar/{{ establecimiento[0] }}">
+            Editar
+          </a>
+          -
+          <a class="btn btn-danger btn-sm" href="/establecimientos/eliminar/{{ establecimiento[0] }}">
+            Eliminar
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+<a class="mt-2 btn btn-primary" href="/establecimientos/registrar">
+  Registrar establecimiento
+</a>
+<a class="mt-2 btn btn-primary" href="/servicios/registrar">
+  Registrar servicio
+</a>
+</div>
+{% endblock %}
+
