@@ -2,6 +2,9 @@ from clases.conexion import Conexion
 from flask_bootstrap import Bootstrap5
 from flask import Flask, render_template, request, redirect, url_for
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 
@@ -101,6 +104,25 @@ def establecimiento_actualizar(id):
     conexion_local.close()
     return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, establecimiento_servicios=establecimiento_servicios, servicios=servicios)
 
+@app.route("/establecimientos/actualizar/guardar/<id>", methods=['POST'])
+def establecimiento_actualizar_guardar(id):
+    nombre = request.form["nombre"]
+    responsable = request.form["responsable"]
+    ubicacion = request.form["ubicacion"]
+    servicios = request.form.getlist('servicios')
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute(f'update `establecimientos` set `nombre`=%s, `responsable`=%s, `ubicacion`=%s where id=%s', (nombre, responsable, ubicacion, id))
+        cursor.execute(f'delete from `establecimiento_servicio` where `establecimiento_id`=%s', (id))
+    conexion_local.commit()
+    for servicio in servicios:
+        with conexion_local.cursor() as cursor:
+            cursor.execute('insert into `establecimiento_servicio` (`establecimiento_id`, `servicio_id`) VALUES (%s, %s)', (id, servicio))
+    conexion_local.commit()
+    conexion_local.close()
+    return redirect(url_for('establecimiento_mostrar'))
+
 
 @app.route("/establecimientos/eliminar/<id>", methods=['DELETE', 'GET'])
 def establecimiento_eliminar(id):
@@ -113,3 +135,49 @@ def establecimiento_eliminar(id):
     conexion_local.commit()
     conexion_local.close()
     return redirect(url_for('establecimiento_mostrar'))
+
+# RUTAS SERVICIOS QUE OFRECE ESTABLECIMIENTOS
+
+@app.route("/servicios/registrar")
+def servicio_registrar():
+    return render_template("/servicios/registrarServicios.html")
+
+@app.route("/servicios/guardar", methods=["POST"])
+def servicio_guardar():
+    nombre = request.form["nombre"]
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute('insert into `servicios` (`nombre`) values (%s)', (nombre))
+    conexion_local.commit()
+    conexion_local.close()
+    return redirect(url_for('establecimiento_mostrar'))
+
+# LOGIN AND REGISTRO DE USUARIOS
+
+@app.route("/registro", methods=["POST", "GET"])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form["nombre"]
+        apellidos = request.form["apellidos"]
+        email = request.form["email"]
+        contraseña = request.form["contraseña"]
+        contraseña_encryptada = generate_password_hash(contraseña)
+        conexion = Conexion()
+        conexion_local = conexion.obtener_conexion()
+        with conexion_local.cursor() as cursor:
+            cursor.execute('insert into `usuarios` (`nombre`, `apellidos`, `email`, `contraseña`) values (%s, %s, %s, %s)', (nombre, apellidos, email, contraseña_encryptada))
+        conexion_local.commit()
+        conexion_local.close()
+        return redirect(url_for('login'))
+    return render_template('auth/registro.html')
+
+@app.route("/login")
+def login():
+    return render_template('auth/login.html')
+
+# 404
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect(url_for('inicio'))

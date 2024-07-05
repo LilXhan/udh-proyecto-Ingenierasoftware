@@ -11,6 +11,15 @@ CREATE TABLE IF NOT EXISTS `servicios` (
   PRIMARY KEY (`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `usuarios` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(255),
+  `apellidos` VARCHAR(255),
+  `email` VARCHAR(255) UNIQUE NOT NULL,
+  `contraseña` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `establecimientos` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(255),
