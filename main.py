@@ -170,11 +170,8 @@ def registro():
             cursor.execute('insert into `usuarios` (`nombre`, `apellidos`, `email`, `contraseña`) values (%s, %s, %s, %s)', (nombre, apellidos, email, contraseña_encryptada))
         conexion_local.commit()
         conexion_local.close()
-        return redirect(url_for('login'))
-
-@app.route("/registro")
-def registro():
-    return render_template('auth/registro.html')
+        
+    return redirect(url_for('login'))
 
 @app.route("/login")
 def login():

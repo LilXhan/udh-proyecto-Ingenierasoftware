@@ -3,8 +3,6 @@ CREATE DATABASE dbCentrosTuristicos;
 
 USE dbCentrosTuristicos;
 
-DROP TABLE servicios;
-
 CREATE TABLE IF NOT EXISTS `servicios` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(255),
