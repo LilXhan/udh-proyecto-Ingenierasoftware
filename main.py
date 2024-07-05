@@ -155,6 +155,7 @@ def servicio_guardar():
 
 # LOGIN AND REGISTRO DE USUARIOS
 
+
 @app.route("/registro", methods=["POST", "GET"])
 def registro():
     if request.method == 'POST':
@@ -170,6 +171,9 @@ def registro():
         conexion_local.commit()
         conexion_local.close()
         return redirect(url_for('login'))
+
+@app.route("/registro")
+def registro():
     return render_template('auth/registro.html')
 
 @app.route("/login")
