@@ -9,6 +9,23 @@
           Registrar usuario
         </h1>
         <div class="card-body">
+          <form method="post">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombres:</label>
+              <input type="text" name="nombre"class="form-control" id="nombre" required>
+            </div>
+            <div class="mb-3">
+              <label for="apellidos" class="form-label">Apellidos:</label>
+              <input type="text" name="apellidos"class="form-control" id="apellidos" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo:</label>
+              <input type="text" name="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+              <label for="contraseña" class="form-label">Contraseña:</label>
+              <input type="password" name="contraseña" class="form-control" id="contraseña" required minlength="6">
+
           <form action="" method="post">
             <div class="mb-3">
               <label for="email" class="form-label">Correo:</label>

@@ -2,6 +2,9 @@ from clases.conexion import Conexion
 from flask_bootstrap import Bootstrap5
 from flask import Flask, render_template, request, redirect, url_for
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 
@@ -101,7 +104,6 @@ def establecimiento_actualizar(id):
     conexion_local.close()
     return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, establecimiento_servicios=establecimiento_servicios, servicios=servicios)
 
-
 @app.route("/establecimientos/actualizar/guardar/<id>", methods=['POST'])
 def establecimiento_actualizar_guardar(id):
     nombre = request.form["nombre"]
@@ -134,8 +136,6 @@ def establecimiento_eliminar(id):
     conexion_local.close()
     return redirect(url_for('establecimiento_mostrar'))
 
-
-
 # RUTAS SERVICIOS QUE OFRECE ESTABLECIMIENTOS
 
 @app.route("/servicios/registrar")
@@ -154,6 +154,23 @@ def servicio_guardar():
     return redirect(url_for('establecimiento_mostrar'))
 
 # LOGIN AND REGISTRO DE USUARIOS
+
+
+@app.route("/registro", methods=["POST", "GET"])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form["nombre"]
+        apellidos = request.form["apellidos"]
+        email = request.form["email"]
+        contraseña = request.form["contraseña"]
+        contraseña_encryptada = generate_password_hash(contraseña)
+        conexion = Conexion()
+        conexion_local = conexion.obtener_conexion()
+        with conexion_local.cursor() as cursor:
+            cursor.execute('insert into `usuarios` (`nombre`, `apellidos`, `email`, `contraseña`) values (%s, %s, %s, %s)', (nombre, apellidos, email, contraseña_encryptada))
+        conexion_local.commit()
+        conexion_local.close()
+        return redirect(url_for('login'))
 
 @app.route("/registro")
 def registro():
