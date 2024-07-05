@@ -133,3 +133,38 @@ def establecimiento_eliminar(id):
     conexion_local.commit()
     conexion_local.close()
     return redirect(url_for('establecimiento_mostrar'))
+
+
+
+# RUTAS SERVICIOS QUE OFRECE ESTABLECIMIENTOS
+
+@app.route("/servicios/registrar")
+def servicio_registrar():
+    return render_template("/servicios/registrarServicios.html")
+
+@app.route("/servicios/guardar", methods=["POST"])
+def servicio_guardar():
+    nombre = request.form["nombre"]
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute('insert into `servicios` (`nombre`) values (%s)', (nombre))
+    conexion_local.commit()
+    conexion_local.close()
+    return redirect(url_for('establecimiento_mostrar'))
+
+# LOGIN AND REGISTRO DE USUARIOS
+
+@app.route("/registro")
+def registro():
+    return render_template('auth/registro.html')
+
+@app.route("/login")
+def login():
+    return render_template('auth/login.html')
+
+# 404
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect(url_for('inicio'))
