@@ -1,6 +1,6 @@
 from clases.conexion import Conexion
 from flask_bootstrap import Bootstrap5
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -8,6 +8,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 
+app.config.from_mapping(
+    SECRET_KEY = 'dev'
+)
 
 # INICIO
 
@@ -154,8 +157,6 @@ def servicio_guardar():
     return redirect(url_for('establecimiento_mostrar'))
 
 # LOGIN AND REGISTRO DE USUARIOS
-
-
 @app.route("/registro", methods=["POST", "GET"])
 def registro():
     if request.method == 'POST':
@@ -166,16 +167,26 @@ def registro():
         contraseña_encryptada = generate_password_hash(contraseña)
         conexion = Conexion()
         conexion_local = conexion.obtener_conexion()
+        usuario_email = None
+        error = None
         with conexion_local.cursor() as cursor:
-            cursor.execute('insert into `usuarios` (`nombre`, `apellidos`, `email`, `contraseña`) values (%s, %s, %s, %s)', (nombre, apellidos, email, contraseña_encryptada))
-        conexion_local.commit()
-        conexion_local.close()
-        
-    return redirect(url_for('login'))
+            cursor.execute('select email from `usuarios` where email = %s', (email))
+            usuario_email = cursor.fetchone()[0]
+        if usuario_email == None:
+            with conexion_local.cursor() as cursor:
+                cursor.execute('insert into `usuarios` (`nombre`, `apellidos`, `email`, `contraseña`) values (%s, %s, %s, %s)', (nombre, apellidos, email, contraseña_encryptada))
+            conexion_local.commit()
+            conexion_local.close()
+            return redirect(url_for('login'))
+        else:
+            error = f'El correo {email} ya fue registrado intente con otro!'
 
-@app.route("/login")
-def login():
-    return render_template('auth/login.html')
+        flash(error)
+    return render_template('/auth/registro.html')
+
+@app.route("/login", methods=["POST", "GET"])
+def login():        
+    return render_template('/auth/login.html')
 
 # 404
 
