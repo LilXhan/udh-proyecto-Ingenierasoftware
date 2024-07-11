@@ -1,10 +1,16 @@
 from clases.conexion import Conexion
 from flask_bootstrap import Bootstrap5
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 
+app.config.from_mapping(
+    SECRET_KEY = 'dev'
+)
 
 # INICIO
 
@@ -101,7 +107,6 @@ def establecimiento_actualizar(id):
     conexion_local.close()
     return render_template("/establecimientos/editarEstablecimientos.html", establecimiento=establecimiento, establecimiento_servicios=establecimiento_servicios, servicios=servicios)
 
-
 @app.route("/establecimientos/actualizar/guardar/<id>", methods=['POST'])
 def establecimiento_actualizar_guardar(id):
     nombre = request.form["nombre"]
@@ -133,3 +138,58 @@ def establecimiento_eliminar(id):
     conexion_local.commit()
     conexion_local.close()
     return redirect(url_for('establecimiento_mostrar'))
+
+# RUTAS SERVICIOS QUE OFRECE ESTABLECIMIENTOS
+
+@app.route("/servicios/registrar")
+def servicio_registrar():
+    return render_template("/servicios/registrarServicios.html")
+
+@app.route("/servicios/guardar", methods=["POST"])
+def servicio_guardar():
+    nombre = request.form["nombre"]
+    conexion = Conexion()
+    conexion_local = conexion.obtener_conexion()
+    with conexion_local.cursor() as cursor:
+        cursor.execute('insert into `servicios` (`nombre`) values (%s)', (nombre))
+    conexion_local.commit()
+    conexion_local.close()
+    return redirect(url_for('establecimiento_mostrar'))
+
+# LOGIN AND REGISTRO DE USUARIOS
+@app.route("/registro", methods=["POST", "GET"])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form["nombre"]
+        apellidos = request.form["apellidos"]
+        email = request.form["email"]
+        contraseña = request.form["contraseña"]
+        contraseña_encryptada = generate_password_hash(contraseña)
+        conexion = Conexion()
+        conexion_local = conexion.obtener_conexion()
+        usuario_email = None
+        error = None
+        with conexion_local.cursor() as cursor:
+            cursor.execute('select email from `usuarios` where email = %s', (email))
+            usuario_email = cursor.fetchone()[0]
+        if usuario_email == None:
+            with conexion_local.cursor() as cursor:
+                cursor.execute('insert into `usuarios` (`nombre`, `apellidos`, `email`, `contraseña`) values (%s, %s, %s, %s)', (nombre, apellidos, email, contraseña_encryptada))
+            conexion_local.commit()
+            conexion_local.close()
+            return redirect(url_for('login'))
+        else:
+            error = f'El correo {email} ya fue registrado intente con otro!'
+
+        flash(error)
+    return render_template('/auth/registro.html')
+
+@app.route("/login", methods=["POST", "GET"])
+def login():        
+    return render_template('/auth/login.html')
+
+# 404
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect(url_for('inicio'))
