@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `apellidos` VARCHAR(255),
   `email` VARCHAR(255) UNIQUE NOT NULL,
   `contraseña` VARCHAR(255) NOT NULL,
-  `rol` VARCHAR(255) NOT NULL,
+  `rol` VARCHAR(255) NULL DEFAULT "staff",
   PRIMARY KEY (`id`)
 );
 
